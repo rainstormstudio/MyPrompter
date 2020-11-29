@@ -6,7 +6,7 @@ Application::Application(std::string input, double velocity) : velocity{velocity
         throw "Unable to open file: " + input;
         return;
     }
-    gfx = new Graphics("Prompter", "./assets/tilesets/Vintl01.png", 16, 16, 0, "./assets/fonts/Monaco.ttf", 800, 40, 2, 80);
+    gfx = new Graphics("Prompter", "./assets/tilesets/Curses_1920x900.png", 16, 16, 0, "./assets/fonts/Monaco.ttf", 800, 60, 2, 60);
     event = new SDL_Event();
     running = true;
     pause = false;
@@ -23,6 +23,7 @@ void Application::update() {
         if (index == -1) {
             index = 0;
             std::getline(file, line);
+            line = offset + line;
             std::getline(file, nextline);
             time = std::chrono::high_resolution_clock::now();
         }
@@ -35,7 +36,7 @@ void Application::update() {
         }
         if (index >= line.length()) {
             index = 0;
-            line = nextline;
+            line = offset + nextline;
             std::getline(file, nextline);
             time = std::chrono::high_resolution_clock::now();
         }
@@ -52,7 +53,16 @@ void Application::render() {
     }
     gfx->write(output, 0, 0);
     gfx->write(nextline, 0, 1, 255, 255, 255, 150);
-    gfx->setBackColor(0, 200, 150, 255, 10, 0);
+    for (int i = 10; i < output.length(); i ++) {
+        if (output[i] == ' ') break;
+        gfx->setBackColor(100, 255, 200, 255, i, 0);
+        gfx->setForeColor(200, 50, 0, 255, i, 0);
+    }
+    for (int i = (10 < output.length() - 1 ? 10 : output.length() - 1); i >= 0; i --) {
+        if (output[i] == ' ') break;
+        gfx->setBackColor(100, 255, 200, 255, i, 0);
+        gfx->setForeColor(200, 50, 0, 255, i, 0);
+    }
     gfx->render();
 }
 
@@ -70,7 +80,7 @@ void Application::processInput() {
                 index ++;
                 if (index > line.length()) {
                     index = 0;
-                    line = nextline;
+                    line = offset + nextline;
                     std::getline(file, nextline);
                 }
                 time = std::chrono::high_resolution_clock::now();

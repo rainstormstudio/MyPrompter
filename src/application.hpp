@@ -18,6 +18,8 @@ class Application {
     std::string nextline;
     bool pause;
 
+    const std::string offset = "          ";
+
 public:
     Application(std::string input, double velocity);
 
